@@ -47,45 +47,41 @@ A robot with a full emotional state machine calibrated entirely around contempt.
 
 | Component | Notes |
 |---|---|
-| ESP32 Dev Board | GPIO/PWM/SPI+I2C |
-| TFT Display (ILI9341, 2.4"/2.8" SPI) | Face + insult text |
+| NodeMCU ESP8266 | Microcontroller |
+| TFT Display (ST7735, 1.8" SPI) | Face + insult text |
 | IMU (MPU6050 I2C) | Detects tilt, shake, pickup, tap |
 | Passive Buzzer | Emotional tones via PWM |
 | 2× Micro Servo (SG90) | Arms — dismissive gestures |
-| 3× LED + 220–330Ω resistors | Mood ring: green / yellow / red |
-| 5V 2A+ external supply | Servos + display need more than USB |
+| Single Green LED + Resistor | Mood indicator blinker |
+| 5V Buck Converter | Servos + display need external power |
 | Breadboard / perfboard, wires | Build |
 | 3D Printed Enclosure | `hateu_pod.scad` — see `/hateu_pod.scad` |
 
-> ⚠️ **Power Note:** Servos need their own 5V rail. Share only common ground with the ESP32. Running servos off the ESP32 3.3V will brown-out the display.
+> ⚠️ **Power Note:** Servos need their own 5V rail. Share only common ground with the ESP8266. Running servos off the ESP8266 3.3V will brown-out the microcontroller.
 
 ---
 
-## Pin Mapping
+## Pin Mapping (ESP8266)
 
-| Signal | GPIO |
-|---|---|
-| TFT SCK | 18 |
-| TFT MOSI | 23 |
-| TFT MISO | 19 |
-| TFT CS | 5 |
-| TFT DC | 2 |
-| TFT RST | 4 |
-| TFT Backlight | 15 |
-| IMU SDA | 21 |
-| IMU SCL | 22 |
-| Servo Left Arm | 13 |
-| Servo Right Arm | 12 |
-| Buzzer | 27 |
-| LED Calm (green) | 14 |
-| LED Annoyed (yellow) | 16 |
-| LED Furious (red) | 17 |
+| Component | Signal | NodeMCU Pin | GPIO |
+|---|---|---|---|
+| **TFT ST7735** | SCK | D5 | 14 |
+| | MOSI | D7 | 13 |
+| | CS | D3 | 0 |
+| | DC / A0 | D4 | 2 |
+| | RESET | D0 | 16 |
+| **MPU6050** | SDA | D2 | 4 |
+| | SCL | D1 | 5 |
+| **Servos** | Left Arm | D6 | 12 |
+| | Right Arm | D8 | 15 |
+| **Output** | Buzzer | TX | 1 |
+| | Green LED | RX | 3 |
 
 ---
 
 ## IMU Interaction Detection
 
-Reads at ~50 Hz, classifies events:
+Reads at ~30 Hz, classifies events:
 
 | Event | Detection | Mood Weight |
 |---|---|---|
@@ -101,22 +97,13 @@ Picking it up is the fastest way to make it furious.
 ## Technical Details
 
 ### Software
-- **Language:** C++ (Arduino framework for ESP32)
+- **Language:** C++ (Arduino framework for ESP8266)
 - **Libraries:**
-  - `Adafruit_ILI9341` — TFT display
+  - `Adafruit_ST7735` — TFT display
   - `Adafruit_GFX` — graphics primitives
-  - `ESP32Servo` — servo PWM
+  - `Servo` — standard ESP8266 servo library
   - `MPU6050` by Electronic Cats — IMU
   - `Wire`, `SPI` — built-in
-
-### Hardware
-- ESP32 DevKit (38-pin or similar)
-- 2.4"/2.8" ILI9341 SPI TFT display
-- MPU6050 IMU breakout
-- 2× SG90 micro servo
-- Passive buzzer module
-- 3× 5mm LEDs (green, yellow, red) + resistors
-- 5V 2A USB power supply with split rail
 
 ---
 
@@ -124,73 +111,64 @@ Picking it up is the fastest way to make it furious.
 
 ```bash
 # 1. Install Arduino IDE 2.x
-# 2. Add ESP32 board package:
-#    Boards Manager → search "esp32" → install by Espressif
-
+# 2. Add ESP8266 board package via Boards Manager
 # 3. Install libraries via Library Manager:
-#    - Adafruit ILI9341
+#    - Adafruit ST7735 and ST7789 Library
 #    - Adafruit GFX Library
-#    - ESP32Servo
 #    - MPU6050 by Electronic Cats
-
 # 4. Open firmware/hatebot/hatebot.ino
-# 5. Select board: "ESP32 Dev Module"
+# 5. Select board: "NodeMCU 1.0 (ESP-12E Module)"
 # 6. Upload
 ```
 
 ---
 
-## Calibration & Tuning
-
-1. Open Serial Monitor at 115200 baud — it prints the IMU baseline on boot.
-2. Let it sit still for the 1-second calibration window before touching it.
-3. Tune thresholds in the `#define` block at the top of `hatebot.ino`:
-   - `SHAKE_VAR_THRESH` — shake sensitivity
-   - `TILT_DEG_THRESH` — tilt angle
-   - `PICKUP_G_THRESH` — pickup sensitivity
-   - `TIMEOUT_ANNOYED_CALM`, `TIMEOUT_FURIOUS_ANNOYED`, `TIMEOUT_SULK_CALM` — de-escalation speed
-4. Confirm servo motion doesn't flicker the TFT (power rail separation check).
-
----
-
 ## Project Documentation
 
-### Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Mood state machine flow*
+### Displays & UI
+![HateBot Display Mockup](display_mockup.jpg)
+*Procedural face engine and typewriter text bar*
 
-### Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Pin connections to ESP32*
+### Schematic & Circuit (Mermaid)
 
-### Build Photos
-![Components](Add photo of your components here)
-*All components laid out*
-
-![Build](Add photos of build process here)
-*Assembly steps*
-
-![Final](Add photo of final product here)
-*Final assembled HateBot*
-
-### Project Demo
-[Add your demo video link here]
+```mermaid
+graph TD
+    Power[5V Power Supply] --> Buck[5V Buck Converter]
+    Buck -->|5V| NodeMCU[ESP8266 NodeMCU]
+    Buck -->|5V| Servo1[Left Servo SG90]
+    Buck -->|5V| Servo2[Right Servo SG90]
+    
+    NodeMCU -->|GND Common| Buck
+    
+    NodeMCU -->|D5 SCK| TFT[ST7735 TFT]
+    NodeMCU -->|D7 MOSI| TFT
+    NodeMCU -->|D3 CS| TFT
+    NodeMCU -->|D4 DC| TFT
+    NodeMCU -->|D0 RST| TFT
+    
+    NodeMCU -->|D2 SDA| MPU[MPU6050 IMU]
+    NodeMCU -->|D1 SCL| MPU
+    
+    NodeMCU -->|D6 PWM| Servo1
+    NodeMCU -->|D8 PWM| Servo2
+    
+    NodeMCU -->|TX| Buzzer[Passive Buzzer]
+    NodeMCU -->|RX| LED[Green Status LED]
+```
 
 ---
 
 ## Roadmap of Uselessness (optional extensions)
 
 - [ ] Light sensor — complains about room lighting
-- [ ] WiFi insult fetch — pull daily insults from a remote text file
 - [ ] Microphone — react to being yelled at
 - [ ] "Forgiveness" gesture — hold level for 10s → rare, begrudging compliment
 
 ---
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
+- **Anandhan**: Software and hardware integration
+- **bhagath**: Hardware and 3D printing
 
 ---
 Made with ❤️ at TinkerHub Useless Projects
