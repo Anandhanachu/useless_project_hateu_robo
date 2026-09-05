@@ -156,6 +156,13 @@ graph TD
     NodeMCU -->|RX| LED[Green Status LED]
 ```
 
+![Physical Schematic](useless_schematic.jpeg)
+*Hardware wiring overview*
+
+### Build Photos
+![Final HateBot Build](useless1.jpeg)
+*The final assembled HateBot*
+
 ---
 
 ## Roadmap of Uselessness (optional extensions)
