@@ -2,13 +2,31 @@
 //  ROBOT FACE ANIMATOR  v1.0
 //  ESP8266 NodeMCU + Adafruit ST7735  128x160 -> landscape 160x128
 //
-//  Wiring:
-//    TFT CS  -> D1 / GPIO5
-//    TFT DC  -> D2 / GPIO4
-//    TFT RST -> D0 / GPIO16
-//    TFT SCK -> D5 / GPIO14  (hardware SPI)
-//    TFT MOSI-> D7 / GPIO13  (hardware SPI)
-//    VCC -> 5V  |  GND -> GND
+//  ── TFT ST7735 ─────────────────────────────────────────────
+//    VCC   -> 3V3
+//    GND   -> GND
+//    LED   -> 3V3
+//    SCK   -> D5 / GPIO14  (hardware SPI)
+//    SDA   -> D7 / GPIO13  (hardware SPI MOSI)
+//    CS    -> D3 / GPIO0
+//    A0/DC -> D4 / GPIO2
+//    RST   -> D0 / GPIO16
+//
+//  ── MPU6050 ────────────────────────────────────────────────
+//    VCC -> 3V3  |  GND -> GND
+//    SDA -> D2 / GPIO4
+//    SCL -> D1 / GPIO5
+//
+//  ── Servos (via 5V buck) ───────────────────────────────────
+//    Servo 1 Signal -> D6 / GPIO12
+//    Servo 2 Signal -> D8 / GPIO15
+//    Servo VCC -> Buck 5V  |  GND -> Buck GND + NodeMCU GND
+//
+//  ── Buzzer (passive, 3-pin module) ────────────────────────
+//    I/O -> TX / GPIO1  |  VCC -> 3V3  |  GND -> GND
+//
+//  ── Traffic Light (Green LED used) ───────────────────────
+//    G   -> RX / GPIO3  |  GND -> GND
 //
 //  Required libraries:  Adafruit GFX  +  Adafruit ST7735/ST7789
 // ============================================================
@@ -24,9 +42,17 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SECTION: TFT CONFIGURATION
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#define TFT_CS   5    // D1 / GPIO5
-#define TFT_DC   4    // D2 / GPIO4
+#define TFT_CS   0    // D3 / GPIO0
+#define TFT_DC   2    // D4 / GPIO2
 #define TFT_RST  16   // D0 / GPIO16
+
+// Future integration pins (not used in this TFT-only build)
+#define MPU_SDA  4    // D2 / GPIO4
+#define MPU_SCL  5    // D1 / GPIO5
+#define SERVO1   12   // D6 / GPIO12
+#define SERVO2   15   // D8 / GPIO15
+#define BUZZER   1    // TX  / GPIO1
+#define LED_GRN  3    // RX  / GPIO3
 
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
