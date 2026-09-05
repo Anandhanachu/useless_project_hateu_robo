@@ -276,11 +276,11 @@ float prevHP=0;
 bool  inPick=false;
 unsigned long pickMs=0;
 #define IMU_CAL  150
-#define SH_VAR   3000.0f
+#define SH_VAR   500000.0f
 #define TILT_DEG 14.0f
 #define PICK_G   0.28f
 #define PICK_MS  480
-#define TAP_HP   6000.0f
+#define TAP_HP   2000.0f
 
 // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 //  FORWARD DECLARATIONS
