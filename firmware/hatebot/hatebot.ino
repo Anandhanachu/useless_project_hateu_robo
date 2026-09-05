@@ -146,6 +146,14 @@ void tickAllSprings() {
 enum Mood { IDLE=0, ANNOYED=1, FURIOUS=2, SULKING=3 };
 Mood mood = IDLE;
 
+// Explicit prototypes to fix Arduino IDE auto-generation errors
+void applyMoodSprings(Mood m);
+void snapMood(Mood m);
+void moveArms(Mood m);
+void buzzPat(Mood m);
+void setInsult(Mood m);
+void changeMood(Mood m);
+
 float ePupX=0, ePupY=0, ePupRX=0;
 bool gazeOn = true;
 
