@@ -341,16 +341,16 @@ int evIMU() {
   float mag=sqrtf(dAx*dAx+dAy*dAy+dAz*dAz);
 
   float hp=fabsf(mag-prevHP); prevHP=mag;
-  if(hp>12000.0f) return 1;
+  if(hp>8000.0f) return 1;
 
   static float win[8]={0}; static uint8_t wi=0;
   win[wi++%8]=mag;
   float mn=0; for(int i=0;i<8;i++) mn+=win[i]; mn/=8.0f;
   float vr=0; for(int i=0;i<8;i++) vr+=(win[i]-mn)*(win[i]-mn); vr/=8.0f;
-  if(vr>6000.0f) return 2;
+  if(vr>3000.0f) return 2;
 
   float tilt=atan2f(dAy,dAz)*180.0f/PI;
-  if(fabsf(tilt)>15.0f) return 1;
+  if(fabsf(tilt)>10.0f) return 1;
   return 0;
 }
 
